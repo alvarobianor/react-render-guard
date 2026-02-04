@@ -1,0 +1,45 @@
+{
+  "name": "render-render-guard",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/render-guard.umd.js",
+  "module": "./dist/render-guard.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/render-guard.es.js",
+      "require": "./dist/render-guard.umd.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && vite build",
+    "dev": "vite build --watch"
+  },
+  "keywords": [
+    "react",
+    "performance",
+    "monitoring",
+    "render"
+  ],
+  "author": "Antigravity",
+  "license": "MIT",
+  "description": "A React library to monitor and detect unnecessary re-renders.",
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.0",
+    "@types/react": "^19.2.11",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.4"
+  }
+}
