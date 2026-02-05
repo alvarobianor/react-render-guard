@@ -1,4 +1,4 @@
-# 🛡️ RenderGuard
+# 🛡️ React Render Guard
 
 > **Stop guessing. Start optimizing.**  
 > A lightweight, non-intrusive React library to detect, visualize, and eliminate unnecessary re-renders in your application.
