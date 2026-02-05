@@ -1,6 +1,6 @@
 {
-  "name": "render-render-guard",
-  "version": "0.1.0",
+  "name": "react-render-guard",
+  "version": "0.1.1",
   "type": "module",
   "main": "./dist/render-guard.umd.js",
   "module": "./dist/render-guard.es.js",
@@ -24,9 +24,13 @@
     "monitoring",
     "render"
   ],
-  "author": "Antigravity",
+  "author": "Álvaro Bianor",
   "license": "MIT",
   "description": "A React library to monitor and detect unnecessary re-renders.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alvarobianor/react-render-guard.git"
+  },
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
