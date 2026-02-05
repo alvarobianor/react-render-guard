@@ -26,7 +26,8 @@ Finding these bottlenecks manually with general profiling tools is tedious and d
 - **🔍 Precision Monitoring**: Uses React's internal Profiler API 100% safely.
 - **⚡ Zero Production Overhead**: Designed to be stripped out or disabled in production.
 - **🛠️ Developer Experience**: Simple `Provider` API.
-- **📊 Real-time Insights**: Console alerts for expensive renders (Visual Overlay coming soon!).
+- **📊 Real-time Insights**: Console alerts for expensive renders.
+- **👁️ Visual Overlay**: A non-intrusive floating panel showing render duration, total render counts, and color-coded health status (Green/Orange/Red) in real-time.
 
 ## 📦 Installation
 
