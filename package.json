@@ -1,6 +1,6 @@
 {
   "name": "react-render-guard",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "main": "./dist/render-guard.umd.js",
   "module": "./dist/render-guard.es.js",
