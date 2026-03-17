@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { isTracked } from "../config";
 
 // Inject keyframes once into the document head (no-op if already present)
 function injectFlashKeyframes() {
@@ -35,12 +36,15 @@ interface FlashOptions {
  * Attaches a flash-on-render animation to any host element via a ref.
  * Color shifts from green → cyan → orange → red as render count increases.
  *
+ * Respects the global `configure({ only: [...] })` allowlist.
+ * Becomes a complete no-op in production (`process.env.NODE_ENV === 'production'`).
+ *
  * @example
  * const { ref, renderCount } = useFlashOnRender("MyComponent");
  * return <div ref={ref}>...</div>;
  */
 export function useFlashOnRender<T extends HTMLElement = HTMLDivElement>(
-  _name?: string,
+  name?: string,
   options: FlashOptions = {},
 ) {
   const { duration = 400 } = options;
@@ -48,7 +52,10 @@ export function useFlashOnRender<T extends HTMLElement = HTMLDivElement>(
   const renderCount = useRef(0);
   renderCount.current += 1;
 
+  const tracked = isTracked(name);
+
   useEffect(() => {
+    if (!tracked) return;
     const el = ref.current;
     if (!el) return;
     const color = getRenderColor(renderCount.current);

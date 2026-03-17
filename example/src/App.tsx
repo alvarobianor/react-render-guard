@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
-import { RenderFlash, withRenderFlash } from "render-guard";
+import { useState, useCallback, useContext, createContext, useReducer } from "react";
+import { RenderFlash, withRenderFlash, useWhyDidYouRender } from "render-guard";
 import "./App.css";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -317,6 +317,165 @@ function IsolatedSection() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Section 5 — Props Diff (useWhyDidYouRender)
+// ─────────────────────────────────────────────────────────────────────────────
+
+interface UserCardProps {
+  name: string;
+  score: number;
+  tag: { label: string }; // object — new ref every render unless memoised
+}
+
+/**
+ * Component that uses useWhyDidYouRender to track which props changed.
+ * Open the browser console and interact with the controls below to see the diff.
+ */
+const PropsDiffDemo = (props: UserCardProps) => {
+  useWhyDidYouRender("PropsDiffDemo", props as unknown as Record<string, unknown>);
+
+  return (
+    <RenderFlash name="PropsDiffDemo" display="block">
+      <div className="info-box" style={{ fontFamily: "monospace" }}>
+        <div><strong>name:</strong> {props.name}</div>
+        <div><strong>score:</strong> {props.score}</div>
+        <div><strong>tag.label:</strong> {props.tag.label}</div>
+      </div>
+    </RenderFlash>
+  );
+};
+
+function PropsDiffSection() {
+  const [score, setScore] = useState(0);
+  const [name, setName] = useState("Alice");
+  // stableTag keeps the same object reference; won't trigger a prop-change log
+  const [stableTag] = useState({ label: "pro" });
+  const [unstableToggle, setUnstableToggle] = useState(false);
+
+  // Simulate unstable prop: new object reference each render
+  const unstableTag = { label: "pro" };
+
+  return (
+    <section className="demo-section">
+      <h2 className="section-title">
+        <span className="section-icon">🔍</span> Props Diff
+      </h2>
+      <p className="section-desc">
+        <code>useWhyDidYouRender</code> logs which props changed between renders.{" "}
+        Check the <strong>browser console</strong> — you'll see a diff table for every re-render.
+        <br />
+        <em>Tip: toggle "Unstable tag" to see object identity mismatches.</em>
+      </p>
+
+      <div className="stat-grid" style={{ gap: "0.75rem", flexWrap: "wrap" }}>
+        <button className="btn" onClick={() => setScore((v) => v + 1)}>
+          + Score (changes <code>score</code> prop)
+        </button>
+        <button
+          className="btn btn-outline"
+          onClick={() => setName((n) => (n === "Alice" ? "Bob" : "Alice"))}
+        >
+          Toggle Name (changes <code>name</code> prop)
+        </button>
+        <button
+          className="btn btn-outline"
+          onClick={() => setUnstableToggle((v) => !v)}
+          title="Forces a parent render to produce a new tag object reference"
+        >
+          Unstable tag re-render {unstableToggle ? "🔴" : "🟢"}
+        </button>
+      </div>
+
+      <PropsDiffDemo
+        name={name}
+        score={score}
+        tag={unstableToggle ? unstableTag : stableTag}
+      />
+
+      <p className="section-desc" style={{ marginTop: "0.5rem", opacity: 0.7 }}>
+        📦 Stable tag: same object reference — no prop change logged for <code>tag</code>.<br />
+        🔴 Unstable tag: new <code>{`{ label: "pro" }`}</code> every render — triggers a
+        change even though the <em>value</em> looks identical.
+      </p>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Section 6 — Hooks Tracker (useWhyDidYouRender)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const ThemeCtx = createContext<{ theme: "light" | "dark" }>({ theme: "light" });
+
+type CountAction = { type: "inc" } | { type: "dec" } | { type: "reset" };
+function countReducer(state: number, action: CountAction): number {
+  if (action.type === "inc") return state + 1;
+  if (action.type === "dec") return state - 1;
+  return 0;
+}
+
+const HooksTrackerDemo = (_props: Record<string, never>) => {
+  const { theme } = useContext(ThemeCtx);
+  const [localCount, setLocalCount] = useState(0);
+  const [reducerCount, dispatch] = useReducer(countReducer, 0);
+
+  // Pass labelled hook values so useWhyDidYouRender can diff them
+  useWhyDidYouRender("HooksTrackerDemo", _props, {
+    "useContext(ThemeCtx) › theme": theme,
+    "useState › localCount": localCount,
+    "useReducer › reducerCount": reducerCount,
+  });
+
+  return (
+    <RenderFlash name="HooksTrackerDemo" display="block">
+      <div className="info-box" style={{ fontFamily: "monospace" }}>
+        <div><strong>theme:</strong> {theme}</div>
+        <div><strong>localCount:</strong> {localCount}</div>
+        <div><strong>reducerCount:</strong> {reducerCount}</div>
+      </div>
+      <div className="stat-grid" style={{ marginTop: "0.75rem", gap: "0.5rem" }}>
+        <button className="btn btn-sm" onClick={() => setLocalCount((v) => v + 1)}>
+          + useState
+        </button>
+        <button className="btn btn-sm btn-outline" onClick={() => dispatch({ type: "inc" })}>
+          + useReducer
+        </button>
+        <button className="btn btn-sm btn-ghost" onClick={() => dispatch({ type: "reset" })}>
+          Reset reducer
+        </button>
+      </div>
+    </RenderFlash>
+  );
+};
+
+function HooksTrackerSection() {
+  const [darkMode, setDarkMode] = useState(false);
+
+  return (
+    <ThemeCtx value={{ theme: darkMode ? "dark" : "light" }}>
+      <section className="demo-section">
+        <h2 className="section-title">
+          <span className="section-icon">🪝</span> Hooks Tracker
+        </h2>
+        <p className="section-desc">
+          Pass a <code>hooks</code> record to <code>useWhyDidYouRender</code> to diff
+          each named hook value between renders. Check the{" "}
+          <strong>browser console</strong> for grouped output.
+        </p>
+
+        <div style={{ marginBottom: "1rem" }}>
+          <button className="btn btn-outline" onClick={() => setDarkMode((v) => !v)}>
+            Toggle theme context ({darkMode ? "dark" : "light"}) — changes{" "}
+            <code>useContext</code>
+          </button>
+        </div>
+
+        <HooksTrackerDemo />
+      </section>
+    </ThemeCtx>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Root
 // ─────────────────────────────────────────────────────────────────────────────
 function App() {
@@ -326,8 +485,8 @@ function App() {
         <div className="header-badge">DEV</div>
         <h1 className="app-title">RenderGuard Playground</h1>
         <p className="app-subtitle">
-          Watch components flash as they re-render — just like React DevTools,
-          but baked into your app.
+          Watch components flash • diff props • track hooks — all in one lib.
+          Open the <strong>browser console</strong> to see the rich diff logs.
         </p>
         <div className="legend">
           <span className="legend-item">
@@ -350,6 +509,8 @@ function App() {
         <CascadeSection />
         <ListSection />
         <IsolatedSection />
+        <PropsDiffSection />
+        <HooksTrackerSection />
       </main>
     </div>
   );

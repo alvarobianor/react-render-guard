@@ -2,7 +2,7 @@ import React, { PropsWithChildren } from "react";
 import { useFlashOnRender } from "../hooks/useFlashOnRender";
 
 interface RenderFlashProps {
-  /** Identifier shown in data attributes for debugging */
+  /** Identifier shown in data attributes and used for the global filter */
   name?: string;
   /** CSS display of the wrapper div. Default: "contents" (layout-transparent) */
   display?: React.CSSProperties["display"];
@@ -16,6 +16,9 @@ interface RenderFlashProps {
 /**
  * Declarative wrapper component that flashes its border on every re-render,
  * similar to React DevTools. Drop it around any JSX to visualize renders.
+ *
+ * Respects `configure({ only: [...] })` — only flashes if `name` is in the
+ * allowlist (or when no filter is set). No-op in production.
  *
  * @example
  * <RenderFlash name="FormRow">
