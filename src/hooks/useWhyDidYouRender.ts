@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs */
 import { useRef, useEffect } from "react";
 import { isTracked } from "../config";
 
@@ -30,7 +31,10 @@ export interface WhyRenderResult {
 function formatValue(v: unknown): string {
   if (v === undefined) return "undefined";
   if (v === null) return "null";
-  if (typeof v === "function") return `[Function ${(v as Function).name || "anonymous"}]`;
+  if (typeof v === "function") {
+    const fn = v as (...args: unknown[]) => unknown;
+    return `[Function ${fn.name || "anonymous"}]`;
+  }
   try {
     const s = JSON.stringify(v);
     return s.length > 80 ? s.slice(0, 77) + "…" : s;
@@ -179,7 +183,7 @@ export function useWhyDidYouRender<P extends Record<string, unknown>>(
       console.groupEnd();
     }
     console.groupEnd();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   });
 
   return { changedProps, changedHooks, summary };
