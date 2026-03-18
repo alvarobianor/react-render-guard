@@ -52,10 +52,9 @@ export const RenderGuard: React.FC<PropsWithChildren<RenderGuardProps>> = ({
       }));
 
       // Basic logging
-      if (actualDuration > 5) {
-        // Arbitrary threshold for demo
+      if (actualDuration > threshold) {
         console.warn(
-          `[RenderGuard] Slow render detected in ${id}: ${actualDuration.toFixed(2)}ms`,
+          `[RenderGuard] Slow render detected in ${id}: ${actualDuration.toFixed(2)}ms (threshold: ${threshold}ms)`,
         );
       }
 
