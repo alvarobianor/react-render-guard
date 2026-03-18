@@ -56,14 +56,14 @@ export function useFlashOnRender<T extends HTMLElement = HTMLDivElement>(
 
   useEffect(() => {
     if (!tracked) return;
-    const el = ref.current;
-    if (!el) return;
+    const element = ref.current;
+    if (!element) return;
     const color = getRenderColor(renderCount.current);
-    el.style.setProperty("--rg-flash-color", color);
+    element.style.setProperty("--rg-flash-color", color);
     // Reset animation by forcing a reflow
-    el.style.animation = "none";
-    void el.offsetHeight;
-    el.style.animation = `__rg_flash__ ${duration}ms ease-out forwards`;
+    element.style.animation = "none";
+    void element.offsetHeight;
+    element.style.animation = `__rg_flash__ ${duration}ms ease-out forwards`;
   });
 
   return { ref, renderCount: renderCount.current };
