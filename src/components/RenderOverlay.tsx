@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 interface OverlayProps {
   lastRenderTime: number;
@@ -64,17 +64,23 @@ export const RenderOverlay: React.FC<OverlayProps> = ({
   renderCount,
   lastRenderId,
 }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [flash, setFlash] = useState(false);
+  const isVisible = renderCount > 0;
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (renderCount > 0) {
-      setIsVisible(true);
-      setFlash(true);
-      const timer = setTimeout(() => setFlash(false), 300);
+    if (isVisible && containerRef.current) {
+      const element = containerRef.current;
+      const statusColor = getStatusColor(lastRenderTime);
+
+      // Trigger flash by direct DOM manipulation to avoid cascading renders
+      element.style.borderColor = statusColor;
+      const timer = setTimeout(() => {
+        if (element) element.style.borderColor = "#333";
+      }, 300);
+
       return () => clearTimeout(timer);
     }
-  }, [renderCount, lastRenderTime]);
+  }, [renderCount, lastRenderTime, isVisible]);
 
   if (!isVisible) return null;
 
@@ -82,10 +88,8 @@ export const RenderOverlay: React.FC<OverlayProps> = ({
 
   return (
     <div
-      style={{
-        ...styles.container,
-        borderColor: flash ? statusColor : "#333",
-      }}
+      ref={containerRef}
+      style={styles.container}
     >
       <h4 style={styles.title}>
         <span
