@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs */
 import { useRef, useEffect } from "react";
 import { isTracked } from "../config";
 

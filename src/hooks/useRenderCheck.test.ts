@@ -53,7 +53,7 @@ describe("useRenderCheck", () => {
     rerenderA();
     rerenderB();
 
-    const calls = consoleSpy.mock.calls.map((c: any[]) => c[0]);
+    const calls = consoleSpy.mock.calls.map((c: unknown[]) => c[0]);
     expect(calls.some((msg: string | string[]) => msg.includes("CompA"))).toBe(
       true,
     );
